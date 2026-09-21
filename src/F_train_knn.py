@@ -1,12 +1,14 @@
-# Loading Dataset
+# F - Train KNN
 
 import pandas as pd
 import joblib
 
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
+
+# Loading Dataset
 
 data_path = "../data/processed/merged_dataset.csv"
 
@@ -36,8 +38,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print("X_train:", X_train.shape)
 print("X_test:", X_test.shape)
-print("y_train:", y_train.shape)
-print("y_test:", y_test.shape)
 
 
 # Feature Scaling
@@ -46,38 +46,28 @@ scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
 
-print("\nAfter scaling:")
-print("X_train shape:", X_train.shape)
-
-print("\nScaled X_train:")
-print("Mean:", X_train.mean())
-print("Std:", X_train.std())
+print("\nData scaled successfully.")
 
 
-# Create MLP Model
+# Create KNN Model
 
-model = MLPClassifier(
-    hidden_layer_sizes=(128, 64, 32),
-    activation="relu",
-    solver="adam",
-    max_iter=300,
-    random_state=42
+model = KNeighborsClassifier(
+    n_neighbors=5,
+    weights="distance",
+    metric="euclidean"
 )
 
-
-# Train MLP
-
-print("\nTraining MLP...")
+print("\nTraining KNN...")
 
 model.fit(X_train, y_train)
 
 print("Training completed.")
 
 
-# Save Model
+# Save KNN model and scaler
 
-joblib.dump(model, "../models/mlp_model.pkl")
-joblib.dump(scaler, "../models/scaler.pkl")
+joblib.dump(model, "../models/knn_model.pkl")
+joblib.dump(scaler, "../models/knn_scaler.pkl")
 
-print("\nModel saved successfully.")
-print("Scaler saved successfully.")
+print("\nKNN model saved successfully.")
+print("KNN scaler saved successfully.")

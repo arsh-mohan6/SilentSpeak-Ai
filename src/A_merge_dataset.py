@@ -1,31 +1,38 @@
 import pandas as pd
-from pathlib import Path
+import os
 
-DATA_PATH = Path("data/raw")
+data_path = "../data/raw"
 
-csv_files = list(DATA_PATH.glob("*/*.csv"))
+data = []
 
-print(f"Found {len(csv_files)} CSV files")
+for label in range(10):
+    folder = os.path.join(data_path, str(label))
 
-all_data = []
+    for file in os.listdir(folder):
+        if file.endswith(".csv"):
+            file_path = os.path.join(folder, file)
 
-for file in csv_files:
-    df = pd.read_csv(file)
+            df = pd.read_csv(file_path)
+            data.append(df)
 
-    print(f"{file.name} -> {df.shape}")
+dataset = pd.concat(data, ignore_index=True)
 
-    all_data.append(df)
+print("Dataset shape:", dataset.shape)
+print(dataset.head())
 
-merged_df = pd.concat(all_data, ignore_index=True)
+print("\nClass distribution:")
+print(dataset["Label"].value_counts().sort_index())
 
-print("\nMerged Shape:", merged_df.shape)
+print("\nMissing values:")
+print(dataset.isnull().sum().sum())#0
+print("\nDuplicate rows:", dataset.duplicated().sum())#0
 
-OUTPUT_PATH = Path("data/processed")
-OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
+os.makedirs("../data/processed", exist_ok=True)
 
-merged_df.to_csv(
-    OUTPUT_PATH / "merged_dataset.csv",
-    index=False
-)
+dataset.to_csv("../data/processed/merged_dataset.csv", index=False)
 
-print("\nDataset saved successfully!")
+print("\nMerged dataset saved successfully.")
+
+features = dataset.drop(columns=["Single Image Frame", "Label"])
+
+print(features.describe().T)
